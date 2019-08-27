@@ -1,0 +1,41 @@
+var inStream;
+var outStream;
+var tempRead;
+
+try {
+   var bytesRead;
+   var bytesChunk;
+   // Create URL object using PDF URL in source
+   var objURL = new java.net.URL(source.getNode('OBX[2]-5.1'));
+   // Open input stream from URL object
+   inStream = objURL.openStream();
+   // Open output stream to local PDF
+   outStream = new java.io.FileOutputStream(new java.io.File('\\DataOut\\SendPDFs\\PDFs\\' + source.getNode('TXA-12') + '.pdf'));
+
+   // Get byte array of length 1024 (1 kB)
+   bytesChunk = java.lang.reflect.Array.newInstance(java.lang.Byte.TYPE, 1024);
+   // Initialize temporary cache of bytes to be sent to output stream
+   tempRead = new java.io.ByteArrayOutputStream();
+   // Read PDF 1 kB at a time until none is left and store in temporary cache
+   while ( (bytesRead = inStream.read(bytesChunk) ) > -1) {
+      tempRead.write(bytesChunk, 0, bytesRead);
+   }
+
+   // Write temporary cache to new file
+   outStream.write(tempRead.toByteArray());
+} catch (e) {
+   qie.debug(e);
+} finally {
+   // Close input stream if not null
+   if (inStream !== null) {
+      inStream.close();
+   }
+   // Close output stream if not null
+   if (outStream !== null) {
+      outStream.close();
+   }
+   // Close cache if not null
+   if (tempRead !== null) {
+      tempRead.close();
+   }
+}
